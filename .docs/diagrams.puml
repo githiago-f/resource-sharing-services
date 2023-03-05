@@ -1,0 +1,66 @@
+@startuml "class-diagram"
+title "Resource sharing service (Domain)"
+
+package server {
+    note as snote
+
+    end note
+
+    package computation {
+        package events {
+            class Command
+            class Result
+            Command -- Result
+        }
+        package execution {
+            entity Program {}
+            note as n1
+                In case of connectivity issues with
+                resources or instances, the service
+                needs to turn off the use of it.
+            end note
+            entity Instance {
+                - status: InstanceStatus;
+            }
+        }
+        Instance .left.> Command : receive
+        Instance .left.> Result : produce
+    }
+    package institutional {
+        note as n2
+            It´s a computer that contains
+            a client server and specific programs
+            that allows users to do specific tasks
+        end note
+        entity Resource {
+            - status: ResourceStatus
+            - memoryCapacity: Decimal
+        }
+        entity Institution {
+            - name: String
+        }
+        entity Student {}
+    }
+}
+
+Resource "1" *-r- "*" Instance
+Program "1" *-u- "*" Instance
+
+Student "*" --o "1" Institution
+Institution "1" *-u- "*" Resource
+
+snote -[hidden]-> institutional
+n2 -[hidden]-> Resource
+n1 -[hidden]-> Instance
+@enduml
+
+@startuml "architectural design"
+!include <C4/C4_Container>
+
+title "Architecture"
+
+Container(server, "Resource discovery", "quarkus", "")
+Container(rcServer, "Resource client server", "")
+Container(log, "Logging service")
+
+@enduml
