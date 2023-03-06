@@ -1,4 +1,17 @@
-# resource-sharing-services
+# Hardware resource management
+
+The aim of this application is to address a common problem faced in distance education – the lack of structure for remote studying. To achieve this objective, the application facilitates and simplifies the sharing of idle hardware and program instances between an institution and its students.
+
+Each program instance occupies a certain amount of memory on the hardware (referred to as a "Resource"), and can be used by one student at a time. While a student can use multiple instances, it is essential to maintain a queue of multiple students to keep the instances busy. The system must also keep track of the capacity of each resource to prevent overconsumption.
+
+By enabling the efficient use of hardware resources, the application ensures that students have access to the necessary programs to support their learning. It provides a solution to the problem of inadequate resources for remote education and helps to ensure that students can continue their studies effectively.
+
+Get a look at the main objectives of the application at this [Notion document](https://www.notion.so/Resource-Sharing-Services-044ffd0bc18c4abe9c809a4a4fb006df?pvs=4).
+
+![Architecture](.docs/architecture-System_context_hardware_sharing_management_service.svg)
+![Class Diagram](.docs/class_diagram-Hardware_resource_management_service__HRM_or_Domain_.svg)
+
+## About the framework
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 

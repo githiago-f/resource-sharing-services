@@ -1,16 +1,69 @@
+@startuml "architecture"
+!include <C4/C4_Container>
+
+title System context hardware sharing management service
+
+AddBoundaryTag("clientServer", $borderColor="green", $fontColor="green", $bgColor="#99ffcc")
+AddBoundaryTag("managementServer", $borderColor="black", $fontColor="black", $bgColor="#ffff99")
+
+note as hrm_rcs_legend
+HRM and RCS stand for "Hardware resource management Service" and "Resource Client Server"
+end note
+
+note as rc_server_legend
+As the RCS need to be very effective and use a very low amount
+of resources from its host machine, maybe would be nice to use
+a microtask based server.
+end note
+
+Person(client, "Student")
+
+together {
+    System_Boundary(ms, "Management system", $tags=managementServer) {
+        Container(hrmServer, "HRM", "Quarkus, HTTP", "Centralized management system for the available hardware resources - workstations, servers and other devices")
+        ContainerDb(hrmDb, "Events and\n entities", "mysql", "Saves all information about the instances, institutions and commands.")
+        Rel_R(hrmServer, hrmDb, "read/write")
+    }
+    System_Boundary(es, "Executive system", $tags=clientServer) {
+        Container(rcServer, "RCS", "?, RPC", "A microtask server that receive requests and sends them to the right program. It will only propagate the necessary data and return the product of the called process")
+        ContainerDb(operations_db, "Operations", "sqlite", "A small dataset that keeps information about some commands processed by the instance (temporarily)\n")
+        Rel_R(rcServer, operations_db, "read/write")
+    }
+    Rel(hrmServer, rcServer, "Command", "rpc")
+    Rel_U(rcServer, hrmServer, "Result", "rpc")
+
+    ' Container(ej, "EventJournal", "Quarkus, RPC", "Keeps a journal of every event based on HRM and RC logs")
+    ' es -[hidden]left- ej
+    ' ms -[hidden]left- ej
+}
+
+hrm_rcs_legend -right-> rcServer
+hrm_rcs_legend -right-> hrmServer
+rc_server_legend .[hidden]up. hrm_rcs_legend
+
+Rel_D(client, hrmServer, "consumes", "https")
+
+SHOW_LEGEND()
+
+footer drawn with PlantUML v. %version() and C4-PlantUML v. C4Version()
+@enduml
+
 @startuml "class-diagram"
-title "Resource sharing service (Domain)"
+title Hardware resource management service (HRM or Domain)
 
-package server {
+package hrm_service {
     note as snote
-
+    This version of the project will not implement
+    Access Control on the resources. It wouldn't
+    interfere on the domain and wouldn't be assertive
+    as it is just an MVP.
     end note
 
     package computation {
         package events {
             class Command
             class Result
-            Command -- Result
+            Command --o Result
         }
         package execution {
             entity Program {}
@@ -52,15 +105,6 @@ Institution "1" *-u- "*" Resource
 snote -[hidden]-> institutional
 n2 -[hidden]-> Resource
 n1 -[hidden]-> Instance
-@enduml
 
-@startuml "architectural design"
-!include <C4/C4_Container>
-
-title "Architecture"
-
-Container(server, "Resource discovery", "quarkus", "")
-Container(rcServer, "Resource client server", "")
-Container(log, "Logging service")
-
+footer drawn with PlantUML v. %version()
 @enduml
