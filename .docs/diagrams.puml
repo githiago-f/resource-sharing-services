@@ -84,7 +84,7 @@ package hrm_service {
     }
     package institutional {
         note as n2
-            It´s a computer that contains
+            It's a computer that contains
             a client server and specific programs
             that allows users to do specific tasks.
             Each resource is unique to the institution
