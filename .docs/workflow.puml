@@ -1,14 +1,13 @@
 @startuml state machine
 (*) --> "send command request"
+--> "check if there is free a instance"
 if "is there free instances?" then
     --> [true] "send command to instances"
     --> "execute command"
     --> "stream the command output to a log file"
-    --> "stream the log file to the hrm"
-    --> "send a stream from hrm to html page"
     --> (*)
 else
-    --> [false] "wait until there is a free instance"
-    -> "send command request"
+    --> [false] "wait"
+    -> "check if there is free a instance"
 endif
 @enduml

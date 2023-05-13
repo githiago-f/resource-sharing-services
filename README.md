@@ -14,8 +14,8 @@ By enabling the efficient use of hardware resources, the application ensures tha
 
 Get a look at the main objectives of the application at this [Notion document](https://www.notion.so/Resource-Sharing-Services-044ffd0bc18c4abe9c809a4a4fb006df?pvs=4).
 
-![Architecture](.docs/architecture-System_context_hardware_sharing_management_service.svg)
-![Class Diagram](.docs/class_diagram-Hardware_resource_management_service__HRM_or_Domain_.svg)
+![Architecture](out/.docs/diagrams/architecture.svg)
+![Class Diagram](out/.docs/diagrams/class-diagram.svg)
 
 ---
 
