@@ -20,7 +20,7 @@ Person(user, "Consumer", $sprite="users")
 System_Ext(gateway, "API Gateway", "exposes every operation possible with mutations and queries")
 
 System_Boundary(hrm, "HRM Microservice") {
-    Component(resource, "Resource Service", "quarkus", "Receive every command and choses for wich client service to delegate.\n", $sprite="java", $tags="service")
+    Component(opservice, "Operation Service", "quarkus", "Receive every command and choses for wich client service to delegate.\n", $sprite="java", $tags="service")
     Component(cmd, "Operation", , "Command or operation that will be executed by the RCS instance\n", $tags="entity")
     ComponentDb(ej, "Event Journal", , "Persistent data about every comand executed for any users. It must implement an offset that identifyies every command.\n", $sprite="mysql")
     ComponentDb(cmd_history, "Query DB", , "Exposes for a query api (graphql) the various states of each event on the system\n", $sprite="mysql")
@@ -32,9 +32,9 @@ System_Ext(rcs, "RCS Instance")
 ' >>>>>> end components
 
 user -> gateway : consumes
-gateway -> resource : consumes
+gateway -> opservice : consumes
 gateway -> cmd_history: queries
-Rel_R(resource, cmd, "create")
+Rel_R(opservice, cmd, "create")
 cmd --> ej : persists
 Rel_U(cmd_proj, cmd_history, "insert")
 Rel_U(cmd_proj, ej, "read")
