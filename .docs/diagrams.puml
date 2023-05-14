@@ -17,29 +17,30 @@ AddElementTag(projection, $shape=RoundedBoxShape())
 ' >>>>>> Components
 Person(user, "Consumer", $sprite="users")
 
-System_Ext(gateway, "API Gateway", "exposes every operation possible with mutations and queries")
+System_Ext(gateway, "API Gateway", "exposes every operation possible for each microservice that it is wired to.\n")
 
 System_Boundary(hrm, "HRM Microservice") {
-    Component(opservice, "Operation Service", "quarkus", "Receive every command and choses for wich client service to delegate.\n", $sprite="java", $tags="service")
-    Component(cmd, "Operation", , "Command or operation that will be executed by the RCS instance\n", $tags="entity")
-    ComponentDb(ej, "Event Journal", , "Persistent data about every comand executed for any users. It must implement an offset that identifyies every command.\n", $sprite="mysql")
-    ComponentDb(cmd_history, "Query DB", , "Exposes for a query api (graphql) the various states of each event on the system\n", $sprite="mysql")
-    Component(cmd_proj, "Operations\nProjection", , "Gets all updates from the event journal and emits it as a queriable resource", $sprite="java")
-    Component(send_proj, "Send command", , "Selects and sends for the correct instance and keeps one eye on the event updates", $tags="projection", $sprite="java")
+    Component(opservice, "Operation Service", "quarkus", "\n", $sprite="java", $tags="service")
+    Component(cmd, "Operation", , "Operation or operation that will be executed by the RCS instance\n", $tags="entity")
+    ComponentDb(ej, "Event Journal", , "Append only operation event history. Keeps a track of every operation\n", $sprite="mysql")
+    ComponentDb(cmd_view, "Operations\nVisualizer", , "Database optimized for reading the current state of an operation\n", $sprite="mysql")
+    Component(cmd_handler, "Operations\nHandler", , "Generate a persistent view (projection) of the current state of the operation", $tags="projection", $sprite="java")
+    Component(send_cmd_handler, "New Operation handler", , "Selects and sends for the correct instance and keeps one eye on the event updates", $tags="projection", $sprite="java")
 }
 
 System_Ext(rcs, "RCS Instance")
 ' >>>>>> end components
 
-user -> gateway : consumes
-gateway -> opservice : consumes
-gateway -> cmd_history: queries
-Rel_R(opservice, cmd, "create")
-cmd --> ej : persists
-Rel_U(cmd_proj, cmd_history, "insert")
-Rel_U(cmd_proj, ej, "read")
-cmd -> send_proj : disptches to update operation
-send_proj -> rcs
+Rel_R(user, gateway, "Consumes", "GraphQL")
+Rel_R(gateway, opservice, "Send Operation", "POST, PUT")
+Rel_R(gateway, opservice, "Query Operation", "GET")
+Rel_R(opservice, cmd, "Create", "save")
+Rel_D(opservice, cmd_view, "Exposes", "find")
+Rel_D(cmd, ej, " Persist Current\nState")
+Rel_U(cmd_handler, cmd_view, "Persist State\nView")
+Rel_U(cmd_handler, ej, " Listen To\nAppended\nEvents")
+cmd -> send_cmd_handler : Dispatch through
+send_cmd_handler -> rcs
 
 SHOW_LEGEND()
 
@@ -68,7 +69,7 @@ System_Boundary(gateway, "API Gateway") {
     Component(res, "Operation resolver", "quarkus", "Exposes every queriable operations as ", $sprite="java", $tags="service")
 }
 
-System_Ext(hrm, "HRM Microservice", "Source of comands data")
+System_Ext(hrm, "HRM Microservice", "Source of Operations data")
 ' >>>>>> end components
 
 user -> res : consumes
