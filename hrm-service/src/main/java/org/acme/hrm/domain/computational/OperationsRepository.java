@@ -8,7 +8,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class OperationsRepository implements PanacheRepository<Operation> {
-    public Optional<Operation> findById(UUID id) {
+    public Optional<Operation> findLastVersion(UUID id) {
         var query = getEntityManager().createQuery(
             "FROM Operation o " +
             "WHERE o.identity.uuid = :id " +

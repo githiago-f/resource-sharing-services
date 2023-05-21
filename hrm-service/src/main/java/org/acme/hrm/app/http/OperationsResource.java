@@ -1,9 +1,9 @@
 package org.acme.hrm.app.http;
 
 import org.acme.hrm.app.http.commands.RequestExecutionCommand;
+import org.acme.hrm.app.http.commands.UpdateExecutionStateCommand;
 import org.acme.hrm.domain.computational.Operation;
 import org.acme.hrm.domain.computational.OperationsService;
-import org.acme.hrm.domain.computational.vo.OperationState;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -30,11 +30,12 @@ public class OperationsResource {
     @PUT
     @Path("{operationId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response change(@PathParam("operationId") String operationId) {
-        return operationsService.persistNewState(
-            OperationState.EXECUTING, 
-            operationId
-        )
+    public Response change(
+        @PathParam("operationId") String operationId, 
+        UpdateExecutionStateCommand command
+    ) {
+        command.setId(operationId);
+        return operationsService.persistNewState(command)
             .map(operation -> Response.ok(operation).build())
             .orElse(Response.status(Status.NOT_FOUND).build());
     }
