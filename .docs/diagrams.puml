@@ -2,9 +2,11 @@
 
 ' >>>>>> style
 !include <C4/C4_Component>
+
+AddElementTag(db, $bgColor="#DAF7A6")
 AddElementTag(service, $bgColor="#b5800d", $fontColor="white")
-AddElementTag(entity, $shape=EightSidedShape())
-AddElementTag(projection, $shape=RoundedBoxShape())
+AddElementTag(entity, $shape=EightSidedShape(), $bgColor="#FF5733", $fontColor="white")
+AddElementTag(handler, $shape=RoundedBoxShape(), $bgColor="#C70039", $fontColor="white")
 
 !define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
 !define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
@@ -22,10 +24,10 @@ System_Ext(gateway, "API Gateway", "exposes every operation possible for each mi
 System_Boundary(hrm, "HRM Microservice") {
     Component(opservice, "Operation Service", "quarkus", "\n", $sprite="java", $tags="service")
     Component(cmd, "Operation", , "Operation or operation that will be executed by the RCS instance\n", $tags="entity")
-    ComponentDb(ej, "Event Journal", , "Append only operation event history. Keeps a track of every operation\n", $sprite="mysql")
-    ComponentDb(cmd_view, "Operations\nVisualizer", , "Database optimized for reading the current state of an operation\n", $sprite="mysql")
-    Component(cmd_handler, "Operations\nHandler", , "Generate a persistent view (projection) of the current state of the operation", $tags="projection", $sprite="java")
-    Component(send_cmd_handler, "New Operation handler", , "Selects and sends for the correct instance and keeps one eye on the event updates", $tags="projection", $sprite="java")
+    ComponentDb(ej, "Event Journal", , "Append only operation event history. Keeps a track of every operation\n", $sprite="mysql", $tags="db")
+    ComponentDb(cmd_view, "Operations\nVisualizer", , "Database optimized for reading the current state of an operation\n", $sprite="mysql", $tags="db")
+    Component(cmd_handler, "Operations\nSummary\nHandler", , "Generate a persistent view (projection) of the current state of the operation", $tags="handler", $sprite="java")
+    Component(send_cmd_handler, "New Operation handler", , "Selects and sends for the correct instance and keeps one eye on the event updates", $tags="handler", $sprite="java")
 }
 
 System_Ext(rcs, "RCS Instance")
@@ -38,7 +40,8 @@ Rel_R(opservice, cmd, "Create", "save")
 Rel_D(opservice, cmd_view, "Exposes", "find")
 Rel_D(cmd, ej, " Persist Current\nState")
 Rel_U(cmd_handler, cmd_view, "Persist State\nView")
-Rel_U(cmd_handler, ej, " Listen To\nAppended\nEvents")
+Rel_U(cmd_handler, ej, " Handle\nAppended\nEvents In Batch")
+Rel_D(send_cmd_handler, ej, "Registers the operation outcome")
 cmd -> send_cmd_handler : Dispatch through
 send_cmd_handler -> rcs
 

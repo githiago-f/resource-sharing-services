@@ -20,6 +20,6 @@ jobs:
         with: 
           commit_user_name: "${{secrets.username}}"
           commit_user_email: "${{secrets.email}}"
-          commit_author: "My User ${{secrets.username}}"
+          commit_author: "Automatic ${{secrets.username}}"
           commit_message: "Generate SVG images for PlantUML diagrams" 
           branch: ${{ github.head_ref }}

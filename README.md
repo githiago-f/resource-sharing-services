@@ -18,6 +18,11 @@ Get a look at the main objectives of the application at this [Notion document](h
 ![Architecture](.docs/out/diagrams/hrm-microservice.svg)
 ![Class Diagram](.docs/out/diagrams/api-gateway.svg)
 
+## Old Architecture and class Diagram
+
+![Architecture](.docs/out/diagrams/old_architecture.svg)
+![Class Diagram](.docs/out/diagrams/old_class-diagram.svg)
+
 ---
 
 ## Security policy
