@@ -7,8 +7,8 @@ import lombok.Data;
 
 @Data
 public class RequestExecutionCommand {
-    private String imageName;
     private String userId;
+    private String program;
     private List<String> parameters;
 
     public UUID getUserId() {

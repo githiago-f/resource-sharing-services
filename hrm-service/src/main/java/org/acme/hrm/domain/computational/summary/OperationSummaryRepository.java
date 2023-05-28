@@ -1,11 +1,12 @@
 package org.acme.hrm.domain.computational.summary;
 
-import io.quarkus.agroal.DataSource;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
+@ApplicationScoped
 public class OperationSummaryRepository {
-    @Inject @DataSource("querydb") EntityManager em;
+    @Inject EntityManager em;
 
     public void save(OperationSummary summary) {
         em.getTransaction().begin();

@@ -2,14 +2,11 @@ package org.acme.hrm.domain.computational.vo;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum OperationState {
-    WAITING("waiting"),     // 0
-    EXECUTING("executing"), // 1
-    FINISHED("finished"),   // 2
-    ERROR("error");         // 3
+public enum SessionState {
+    IDLE("idle"), RUNNING("running"), STOPPED("stopped");
 
     private final String label;
-    private OperationState(String label) {
+    SessionState(String label) {
         this.label = label;
     }
 
