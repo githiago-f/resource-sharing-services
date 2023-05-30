@@ -17,67 +17,8 @@ AddElementTag(handler, $shape=RoundedBoxShape(), $bgColor="#C70039", $fontColor=
 ' >>>>>> end style
 
 ' >>>>>> Components
-Person(user, "Consumer", $sprite="users")
 
-System_Ext(gateway, "API Gateway", "exposes every operation possible for each microservice that it is wired to.\n")
-
-System_Boundary(hrm, "HRM Microservice") {
-    Component(opservice, "Operation Service", "quarkus", "\n", $sprite="java", $tags="service")
-    Component(cmd, "Operation", , "Operation or operation that will be executed by the RCS instance\n", $tags="entity")
-    ComponentDb(ej, "Event Journal", , "Append only operation event history. Keeps a track of every operation\n", $sprite="mysql", $tags="db")
-    ComponentDb(cmd_view, "Operations\nVisualizer", , "Database optimized for reading the current state of an operation\n", $sprite="mysql", $tags="db")
-    Component(cmd_handler, "Operations\nSummary\nHandler", , "Generate a persistent view (projection) of the current state of the operation", $tags="handler", $sprite="java")
-    Component(send_cmd_handler, "New Operation handler", , "Selects and sends for the correct instance and keeps one eye on the event updates", $tags="handler", $sprite="java")
-}
-
-System_Ext(rcs, "RCS Instance")
 ' >>>>>> end components
-
-Rel_R(user, gateway, "Consumes", "GraphQL")
-Rel_R(gateway, opservice, "Send Operation", "POST, PUT")
-Rel_R(gateway, opservice, "Query Operation", "GET")
-Rel_R(opservice, cmd, "Create", "save")
-Rel_D(opservice, cmd_view, "Exposes", "find")
-Rel_D(cmd, ej, " Persist Current\nState")
-Rel_U(cmd_handler, cmd_view, "Persist State\nView")
-Rel_U(cmd_handler, ej, " Handle\nAppended\nEvents In Batch")
-Rel_D(send_cmd_handler, ej, "Registers the operation outcome")
-cmd -> send_cmd_handler : Dispatch through
-send_cmd_handler -> rcs
-
-SHOW_LEGEND()
-
-@enduml
-
-@startuml "api-gateway"
-
-' >>>>>> style
-!include <C4/C4_Component>
-AddElementTag(service, $bgColor="#b5800d", $fontColor="white")
-AddElementTag(entity, $shape=EightSidedShape())
-AddElementTag(projection, $shape=RoundedBoxShape())
-
-!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
-!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
-!include DEVICONS/angular.puml
-!include DEVICONS/java.puml
-!include DEVICONS/mysql.puml
-!include FONTAWESOME/users.puml
-' >>>>>> end style
-
-' >>>>>> Components
-Person(user, "Consumer", $sprite="users")
-
-System_Boundary(gateway, "API Gateway") {
-    Component(res, "Operation resolver", "quarkus", "Exposes every queriable operations as ", $sprite="java", $tags="service")
-}
-
-System_Ext(hrm, "HRM Microservice", "Source of Operations data")
-' >>>>>> end components
-
-user -> res : consumes
-res -> hrm : reads query db
-
 
 SHOW_LEGEND()
 

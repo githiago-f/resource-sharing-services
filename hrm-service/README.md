@@ -1,10 +1,14 @@
 # hrm-service
 
+## Example calls
 
-Main concepts:
- - **Operation**: is a command that the user execute on the system.
- - **Image**: the image that the user is using.
- - 
+Start a new workspace for any user:
+```bash
+curl -X POST "/workspace" \ 
+    -H 'Content-Type: application/json' \ 
+    -d '{"image": "alpine:3.14"}'
+```
+
 
 ## Running the application in dev mode
 

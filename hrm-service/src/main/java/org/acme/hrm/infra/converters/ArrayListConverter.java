@@ -10,13 +10,14 @@ import jakarta.persistence.AttributeConverter;
 
 @Converter(autoApply = true)
 public class ArrayListConverter implements AttributeConverter<List<String>, String> {
+    String mapper(List<String> attr) {
+        return attr.stream().collect(Collectors.joining(", "));
+    }
 
     @Override
     public String convertToDatabaseColumn(List<String> attribute) {
         return Optional.ofNullable(attribute)
-            .map(attr -> 
-                attr.stream().collect(Collectors.joining(", "))
-            )
+            .map(this::mapper)
             .orElse(null);
     }
 
