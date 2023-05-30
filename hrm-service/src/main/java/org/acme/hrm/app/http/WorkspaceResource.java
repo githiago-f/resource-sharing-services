@@ -1,36 +1,32 @@
 package org.acme.hrm.app.http;
 
-import java.util.UUID;
-
 import org.acme.hrm.domain.executive.WorkspaceService;
 import org.acme.hrm.domain.executive.commands.StartWorkspaceCommand;
 import org.acme.hrm.domain.executive.commands.StopWorkspaceCommand;
-import org.eclipse.microprofile.jwt.Claim;
-import org.eclipse.microprofile.jwt.Claims;
+import org.acme.hrm.domain.executive.workspace.Workspace;
 
+import io.quarkus.security.Authenticated;
+import io.quarkus.vertx.web.Body;
+import io.quarkus.vertx.web.Route;
+import io.quarkus.vertx.web.RouteBase;
+import io.quarkus.vertx.web.Route.HttpMethod;
+import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Path("/workspace")
+@RouteBase(path = "/workspaces")
 public class WorkspaceResource {
-
-    @Inject @Claim(standard = Claims.sub) String sub;
     @Inject WorkspaceService workspaceService;
 
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    Response start(StartWorkspaceCommand command) {
-        workspaceService.requestStart(command.withUserId(UUID.fromString(sub)));
-        return Response.ok().build();
+    @Authenticated
+    @Route(path = "/start", methods = HttpMethod.POST)
+    Uni<Workspace> start(@Body StartWorkspaceCommand command) {
+        return workspaceService.requestStart(command);
     }
 
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    Response stop(StopWorkspaceCommand command) {
+    @Authenticated
+    @Route(path = "/stop", methods = HttpMethod.POST)
+    Response stop(@Body StopWorkspaceCommand command) {
         workspaceService.requestStop(command);
         return Response.ok().build();
     }
