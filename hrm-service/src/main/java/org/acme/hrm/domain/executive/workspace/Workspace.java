@@ -9,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.*;
 
@@ -16,7 +17,7 @@ import lombok.*;
 @Builder @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "workspaces")
+@Table(name = "workspaces", indexes = @Index(columnList = "userId"))
 public class Workspace {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

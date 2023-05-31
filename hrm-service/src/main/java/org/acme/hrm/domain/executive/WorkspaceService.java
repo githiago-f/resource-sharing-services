@@ -14,29 +14,42 @@ import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.eclipse.microprofile.reactive.messaging.OnOverflow;
 import org.eclipse.microprofile.reactive.messaging.OnOverflow.Strategy;
 
+import io.quarkus.hibernate.reactive.panache.common.WithSession;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @ApplicationScoped
 public class WorkspaceService {
     @Inject @Claim(standard = Claims.sub) String sub;
 
     @OnOverflow(value = Strategy.THROW_EXCEPTION)
-    @Channel("workspace-start") Emitter<Workspace> startEmitter;
+    @Channel("workspace-start") Emitter<String> startEmitter;
 
     @Inject WorkspaceRepository workspaceRepository;
 
+    @WithSession @Transactional
     public Uni<Workspace> requestStart(StartWorkspaceCommand command) {
-        Workspace workspace = Workspace.builder()
+        log.info("Workspace for user {} is starting", sub);
+        Workspace.WorkspaceBuilder wsBuilder = Workspace.builder()
             .userId(UUID.fromString(sub))
             .image(command.getImage())
             .parameters(command.getParameters())
-            .state(WorkspaceState.STARTING)
-            .build();
-        return workspaceRepository.persistAndFlush(workspace)
-            .onItem()
-            .invoke(startEmitter::send);
+            .state(WorkspaceState.STARTING);
+        
+        if(command.getUuid().isEmpty()) {
+            return workspaceRepository.persistAndFlush(wsBuilder.build())
+                .onItem().invoke(ws -> startEmitter.send(ws.getUuid().toString()));
+        }
+
+        String uuid = command.getUuid().get();
+        log.info("Workspace id provided: {}", uuid);
+        wsBuilder.uuid(UUID.fromString(uuid));
+        
+        return workspaceRepository.persist(wsBuilder.build());
     }
 
     public void requestExecute() {}
