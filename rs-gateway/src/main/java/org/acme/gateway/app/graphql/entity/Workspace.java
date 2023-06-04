@@ -23,4 +23,13 @@ public class Workspace {
     private List<String> parameters; // docker parameters
     private UUID userId;
     private WorkspaceState state;
+
+    public boolean checkOwner(String uuid) {
+        return userId.equals(UUID.fromString(uuid));
+    }
+
+    @Override
+    public String toString() {
+        return "Workspace(uuid=" + uuid + ", userId=" + userId + ", state=" + state + ")";
+    }    
 }

@@ -7,7 +7,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.annotation.security.PermitAll;
 
 import java.util.Set;
-import java.util.UUID;
 
 import org.eclipse.microprofile.jwt.Claims;
 
@@ -25,7 +24,7 @@ public class ApiResource {
             .groups(Set.of("user"))
             .claim(Claims.full_name, "Usuário teste")
             .claim(Claims.email, email)
-            .subject(UUID.randomUUID().toString())
+            .subject("53517655-dbff-4731-83a2-fb9d9d64daa7")
             .innerSign()
             .encrypt();
     }

@@ -1,22 +1,48 @@
 package org.acme.gateway.infra.rest;
 
+import java.util.List;
+
 import org.acme.gateway.app.graphql.entity.Workspace;
-import org.acme.gateway.app.graphql.inputs.StartWorkspace;
+import org.acme.gateway.app.graphql.inputs.CreateWorkspaceDTO;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-import io.quarkus.oidc.token.propagation.AccessToken;
-import io.smallrye.mutiny.Uni;
-import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import io.smallrye.mutiny.Uni;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import io.quarkus.oidc.token.propagation.AccessToken;
 
 @AccessToken
 @Path("/workspaces")
 @RegisterRestClient(configKey = "workspaces")
 public interface WorkspaceClient {
-    @POST
-    @Path("/start")
+    @GET
+    @Path("/list")
     @Consumes(MediaType.APPLICATION_JSON)
-    Uni<Workspace> start(StartWorkspace command);
+    @Produces(MediaType.APPLICATION_JSON)
+    Uni<List<Workspace>> findAllByUser(@QueryParam("page") Integer page);
+
+    @POST
+    @Path("/create")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    Uni<Workspace> create(CreateWorkspaceDTO command);
+
+    @GET
+    @Path("/{uuid}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    Uni<Workspace> findOneByUser(@PathParam("uuid") String uuid);
+
+    @PUT
+    @Path("/{uuid}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    Uni<Workspace> changeState(@PathParam("uuid") String uuid);
 }
