@@ -3,10 +3,8 @@ package org.acme.hrm.infra.rbac;
 import java.util.UUID;
 
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import lombok.AllArgsConstructor;
 
-@Slf4j
 @AllArgsConstructor @Getter
 public class OwnRule<Sub extends CheckOwnerId> implements Rule<Sub, String> {
     private Sub subject;

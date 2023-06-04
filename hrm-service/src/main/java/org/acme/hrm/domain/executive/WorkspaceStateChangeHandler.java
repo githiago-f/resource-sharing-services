@@ -1,7 +1,5 @@
 package org.acme.hrm.domain.executive;
 
-import java.util.UUID;
-
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.acme.hrm.domain.executive.workspace.WorkspaceRepository;
 
