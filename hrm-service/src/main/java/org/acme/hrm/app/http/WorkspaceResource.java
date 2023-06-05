@@ -13,12 +13,18 @@ import lombok.extern.slf4j.Slf4j;
 import io.quarkus.vertx.web.Body;
 import io.quarkus.vertx.web.Param;
 import io.quarkus.vertx.web.Route;
+import jakarta.ws.rs.core.Response;
 import io.quarkus.vertx.web.RouteBase;
 import io.quarkus.panache.common.Page;
+import jakarta.ws.rs.NotFoundException;
 import io.quarkus.security.Authenticated;
+import jakarta.ws.rs.core.Response.Status;
 import io.quarkus.vertx.web.Route.HttpMethod;
+import io.quarkus.security.UnauthorizedException;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
 
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
 import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
 
@@ -62,5 +68,18 @@ public class WorkspaceResource {
     Uni<Workspace> changeState(@Param("uuid") String uuid) {
         log.info("Request workspace {} toggle state", uuid);
         return workspaceService.requestChangeState(uuid);
+    }
+
+    @ServerExceptionMapper
+    public Response map(RuntimeException e) {
+        ResponseBuilder builder;
+        if(e instanceof NotFoundException) {
+            builder = Response.status(Status.NOT_FOUND);
+        } else if(e instanceof UnauthorizedException) {
+            builder = Response.status(Status.UNAUTHORIZED);
+        } else {
+            builder = Response.serverError();
+        }
+        return builder.entity(e.getMessage()).build();
     }
 }

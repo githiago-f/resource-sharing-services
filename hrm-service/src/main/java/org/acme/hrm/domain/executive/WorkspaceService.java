@@ -36,14 +36,20 @@ public class WorkspaceService {
 
     @Inject WorkspaceRepository workspaceRepository;
 
+    private String message(Workspace workspace) {
+        return workspace.getUuid().toString() + ":" + workspace.getState();
+    }
+
+    private Workspace getWorkspaceIfOwner(Workspace workspace) {
+        if(new OwnRule<>(workspace).isSatisfiedBy(sub)) {
+            return workspace;
+        }
+        return null;
+    }
+
     public Uni<Workspace> getWorkspace(String workspaceId) {
         return workspaceRepository.findById(UUID.fromString(workspaceId))
-            .onItem().ifNotNull().transform(workspace -> {
-                if(new OwnRule<>(workspace).isSatisfiedBy(sub)) {
-                    return workspace;
-                }
-                return null;
-            })
+            .onItem().ifNotNull().transform(this::getWorkspaceIfOwner)
             .onItem().ifNull().failWith(new WorkspaceDoesntExistsException(sub));
     }
 
@@ -61,14 +67,13 @@ public class WorkspaceService {
                 .build();
         
         return workspaceRepository.persistAndFlush(workspace)
-            .invoke(wk -> log.info(wk.toString()))
-            .onItem()
-            .invoke(ws -> stateEmmiter.send(ws.getUuid().toString() + ":" + ws.getState()));
+            .onItem().invoke(ws -> stateEmmiter.send(message(ws)));
     }
 
     public Uni<Workspace> requestChangeState(String uuid) {
         return workspaceRepository.findForUpdate(UUID.fromString(uuid))
             .onItem().ifNull().failWith(new WorkspaceNotFoundException(uuid))
+            .onItem().ifNotNull().transform(this::getWorkspaceIfOwner)
             .onItem().ifNotNull().transform(new WorkspaceStateToggle()::apply)
             .onItem().ifNotNull().call(workspace -> {
                 var updateRequest = workspaceRepository.update(
@@ -77,10 +82,11 @@ public class WorkspaceService {
                     workspace.getUuid()
                 );
                 return updateRequest.onItem().transform(i -> {
-                    log.info("Workspace updated: {}", i);
                     if(i > 0) return workspace;
                     return null;
-                }).onFailure().invoke(r -> log.error("error: ", r));
+                })
+                .onItem().ifNotNull().invoke(wk -> stateEmmiter.send(message(wk)))
+                .onFailure().invoke(r -> log.error("error: ", r));
             });
     }
 }

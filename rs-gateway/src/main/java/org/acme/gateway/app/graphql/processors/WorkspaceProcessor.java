@@ -2,10 +2,10 @@ package org.acme.gateway.app.graphql.processors;
 
 import org.acme.gateway.app.graphql.entity.Workspace;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import io.smallrye.mutiny.operators.multi.processors.BroadcastProcessor;
-import jakarta.inject.Singleton;
 
-@Singleton
+@ApplicationScoped
 public class WorkspaceProcessor {
     private final BroadcastProcessor<Workspace> processor;
 

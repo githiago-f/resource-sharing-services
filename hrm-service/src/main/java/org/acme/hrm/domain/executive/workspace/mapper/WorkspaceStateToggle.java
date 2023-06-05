@@ -12,7 +12,7 @@ public class WorkspaceStateToggle implements Function<Workspace, Workspace> {
 
     @Override
     public Workspace apply(Workspace workspace) {
-        log.info("workspace state:::{}", workspace.getState());
+        log.info("Current workspace state::{}", workspace.getState());
         switch(workspace.getState()) {
             case STOPPING, STOPED:
                 return workspace.withState(WorkspaceState.STARTING);
