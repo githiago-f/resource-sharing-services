@@ -1,9 +1,15 @@
 package org.acme.hrm.domain.executive.exceptions;
 
-import jakarta.ws.rs.NotFoundException;
+import java.util.UUID;
 
+import jakarta.ws.rs.NotFoundException;
+import lombok.Getter;
+
+@Getter
 public class WorkspaceNotFoundException extends NotFoundException {
-    public WorkspaceNotFoundException(String workspaceId) {
-        super("Workspace " + workspaceId + " not found");
+    private String workspaceId;
+    public WorkspaceNotFoundException(UUID workspaceId) {
+        super("Workspace not found");
+        this.workspaceId = workspaceId.toString();
     }
 }

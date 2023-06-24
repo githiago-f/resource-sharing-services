@@ -63,7 +63,7 @@ public class WorkspaceStateChangeHandler {
     @WithSession
     public Uni<Workspace> findWorkspace(UUID uuid) {
         return workspaceRepository.findForUpdate(uuid).onItem()
-            .ifNull().failWith(new WorkspaceNotFoundException(uuid.toString()))
+            .ifNull().failWith(new WorkspaceNotFoundException(uuid))
             .onItem().ifNotNull().transform(this::allocateFor)
             .onItem().ifNotNull().call(workspace -> {
                 var updateRequest = workspaceRepository.update(

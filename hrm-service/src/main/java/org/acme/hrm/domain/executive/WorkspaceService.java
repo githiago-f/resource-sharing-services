@@ -7,15 +7,11 @@ import org.acme.hrm.infra.rbac.OwnRule;
 import org.eclipse.microprofile.jwt.Claim;
 import org.eclipse.microprofile.jwt.Claims;
 import org.acme.hrm.domain.executive.workspace.Workspace;
-import org.eclipse.microprofile.reactive.messaging.Channel;
-import org.eclipse.microprofile.reactive.messaging.Emitter;
-import org.eclipse.microprofile.reactive.messaging.OnOverflow;
+import org.eclipse.microprofile.reactive.messaging.*;
 import org.acme.hrm.domain.executive.workspace.vo.WorkspaceState;
 import org.acme.hrm.domain.executive.workspace.WorkspaceRepository;
-import org.acme.hrm.domain.executive.workspace.mapper.WorkspaceStateToggle;
 import org.acme.hrm.domain.executive.commands.CreateWorkspaceCommand;
-import org.eclipse.microprofile.reactive.messaging.OnOverflow.Strategy;
-import org.acme.hrm.domain.executive.exceptions.WorkspaceDoesntExistsException;
+import org.acme.hrm.domain.executive.workspace.mapper.WorkspaceStateToggle;
 import org.acme.hrm.domain.executive.exceptions.WorkspaceNotFoundException;
 
 import jakarta.inject.Inject;
@@ -31,7 +27,7 @@ import io.quarkus.hibernate.reactive.panache.common.WithSession;
 public class WorkspaceService {
     @Inject @Claim(standard = Claims.sub) String sub;
 
-    @OnOverflow(value = Strategy.THROW_EXCEPTION)
+    @OnOverflow(value = OnOverflow.Strategy.THROW_EXCEPTION)
     @Channel("workspace-state-change") Emitter<String> stateEmmiter;
 
     @Inject WorkspaceRepository workspaceRepository;
@@ -48,9 +44,10 @@ public class WorkspaceService {
     }
 
     public Uni<Workspace> getWorkspace(String workspaceId) {
-        return workspaceRepository.findById(UUID.fromString(workspaceId))
+        UUID uuid = UUID.fromString(workspaceId);
+        return workspaceRepository.findById(uuid)
             .onItem().ifNotNull().transform(this::getWorkspaceIfOwner)
-            .onItem().ifNull().failWith(new WorkspaceDoesntExistsException(sub));
+            .onItem().ifNull().failWith(new WorkspaceNotFoundException(uuid));
     }
 
     public Uni<List<Workspace>> getAllUserWorkspaces(Page page) {
@@ -70,11 +67,12 @@ public class WorkspaceService {
             .onItem().invoke(ws -> stateEmmiter.send(message(ws)));
     }
 
-    public Uni<Workspace> requestChangeState(String uuid) {
-        return workspaceRepository.findForUpdate(UUID.fromString(uuid))
-            .onItem().ifNull().failWith(new WorkspaceNotFoundException(uuid))
+    public Uni<Workspace> requestChangeState(String workspaceId) {
+        UUID uuid = UUID.fromString(workspaceId);
+        return workspaceRepository.findForUpdate(uuid)
             .onItem().ifNotNull().transform(this::getWorkspaceIfOwner)
             .onItem().ifNotNull().transform(new WorkspaceStateToggle()::apply)
+            .onItem().ifNull().failWith(new WorkspaceNotFoundException(uuid))
             .onItem().ifNotNull().call(workspace -> {
                 var updateRequest = workspaceRepository.update(
                     "state = ?1 WHERE uuid = ?2", 

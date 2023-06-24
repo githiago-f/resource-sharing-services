@@ -10,14 +10,7 @@ import org.acme.hrm.infra.converters.ArrayListConverter;
 import org.acme.hrm.domain.executive.workspace.vo.WorkspaceState;
 
 import lombok.*;
-import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.Table;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Basic;
-import jakarta.persistence.Convert;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 
 @Entity
 @Builder @Getter

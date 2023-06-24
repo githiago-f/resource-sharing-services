@@ -6,15 +6,8 @@ import org.acme.gateway.app.graphql.entity.Workspace;
 import org.acme.gateway.app.graphql.inputs.CreateWorkspaceDTO;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
+import jakarta.ws.rs.*;
 import io.smallrye.mutiny.Uni;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import io.quarkus.oidc.token.propagation.AccessToken;
 

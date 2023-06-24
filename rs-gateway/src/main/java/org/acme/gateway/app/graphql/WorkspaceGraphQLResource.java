@@ -16,12 +16,12 @@ import org.acme.gateway.app.graphql.processors.WorkspaceProcessor;
 
 import jakarta.inject.Inject;
 import io.smallrye.mutiny.Uni;
-import lombok.extern.slf4j.Slf4j;
-import io.quarkus.security.Authenticated;
+import lombok.extern.slf4j.Slf4j; 
+import jakarta.annotation.security.RolesAllowed;
 
 @Slf4j
 @GraphQLApi
-@Authenticated
+@RolesAllowed({"user"})
 @Description("A workspace is the domain feature of this application and is "+
     "related to the hability of starting a virtual environment.")
 public class WorkspaceGraphQLResource {
@@ -39,7 +39,8 @@ public class WorkspaceGraphQLResource {
     @Query
     @Description("Get workspace")
     public Uni<Workspace> workspace(String workspaceId) {
-        return workspaceClient.findOneByUser(workspaceId);
+        return workspaceClient.findOneByUser(workspaceId)
+            .onFailure().recoverWithNull();
     }
 
     @Mutation
@@ -55,7 +56,8 @@ public class WorkspaceGraphQLResource {
     @Description("Start/Stop a given workspace for user")
     public Uni<Workspace> toggleWorkspaceState(String workspaceId) {
         return workspaceClient.changeState(workspaceId)
+            .onFailure().recoverWithNull()
             .onItem().invoke(i -> log.info(i.toString()))
-            .onItem().ifNotNull().invoke(processor.getProcessor()::onNext);
+            .onItem().invoke(processor.getProcessor()::onNext);
     }
 }

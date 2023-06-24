@@ -1,4 +1,6 @@
-@startuml "hrm-microservice"
+@startuml "Workspaces"
+
+title "Workspace Locator Service"
 
 ' >>>>>> style
 !include <C4/C4_Component>
@@ -13,10 +15,29 @@ AddElementTag(handler, $shape=RoundedBoxShape(), $bgColor="#C70039", $fontColor=
 !include DEVICONS/angular.puml
 !include DEVICONS/java.puml
 !include DEVICONS/mysql.puml
-!include FONTAWESOME/users.puml
+!include FONTAWESOME/leaf.puml
 ' >>>>>> end style
 
 ' >>>>>> Components
+
+Person(consumer, "Consumer")
+
+Container_Ext(gateway, "Gateway", "quarkus, graphql", "Exposes an easy-to-consume interface, like a BFF")
+
+System_Boundary(api, "Workspace Service") {
+    Container(wsloc, "Workspaces Resource", "", "Handles workspace allocation requests and returns a new workspace session when its ready", $tags="service", $sprite="java")
+    Container(stateHandler, "Workspace State Handler", "", "Each workspace state change will create a new domain event, that will be handled by this object", $tags="handler", $sprite="java")
+    Container(wrks, "Workspace", $sprite=leaf, $tags=entity)
+
+    Rel_D(wsloc, stateHandler, "Message", "Blocking message")
+}
+
+Container_Ext(usr, "Users", "quarkus", "Service that handles user data and provides a simple config for theyr accesses")
+
+consumer --> gateway : Interacts with
+gateway -right-> wsloc
+Rel_R(gateway, usr, "Authenticate via", "http2")
+wsloc -[hidden]up-> usr
 
 ' >>>>>> end components
 
