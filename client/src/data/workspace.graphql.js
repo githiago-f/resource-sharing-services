@@ -3,9 +3,9 @@ import { graphQlUrl } from './config.js';
 
 
 /**
- * 
- * @param {'homePage' | 'createWorkspace'} operationName 
- * @param {unknown extends Object} vars 
+ *
+ * @param {'homePage' | 'createWorkspace'} operationName
+ * @param {unknown extends Object} vars
  * @returns {Promise<any>}
 */
 export const graphql = (operationName, vars) => {

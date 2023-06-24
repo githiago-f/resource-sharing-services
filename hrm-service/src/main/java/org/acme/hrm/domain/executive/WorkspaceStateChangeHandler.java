@@ -2,13 +2,11 @@ package org.acme.hrm.domain.executive;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 
-import java.time.Duration;
 import java.util.UUID;
 
 import org.acme.hrm.domain.executive.workspace.Workspace;
 import org.acme.hrm.domain.executive.workspace.vo.WorkspaceState;
 import org.acme.hrm.domain.executive.workspace.WorkspaceRepository;
-import org.acme.hrm.domain.executive.exceptions.WorkspaceNotFoundException;
 
 import jakarta.inject.Inject;
 import io.smallrye.mutiny.Uni;
@@ -58,7 +56,7 @@ public class WorkspaceStateChangeHandler {
         log.info("Searching for Workspace:::{}", uuid.toString());
         return workspaceRepository.findForUpdate(uuid);
     }
-    
+
     @WithSession
     @Incoming("state-change")
     public Uni<?> onMessage(String message) {
@@ -68,7 +66,7 @@ public class WorkspaceStateChangeHandler {
             .onItem().ifNotNull().transform(this::allocateFor)
             .onItem().ifNotNull().call(workspace -> {
                 var updateRequest = workspaceRepository.update(
-                    "state = ?1 WHERE uuid = ?2", 
+                    "state = ?1 WHERE uuid = ?2",
                     workspace.getState(),
                     workspace.getUuid()
                 );
