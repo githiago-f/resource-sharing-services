@@ -1,7 +1,7 @@
 # Resource sharing services 
 
 This application is a re-build of this [DB2 Assignment](https://github.com/githiago-f/resource-sharing).
-For contributing, remember you should reexecute the command: `plantuml -tsvg -v -o "out/digramas" "**.puml"`
+For contributing, remember you should reexecute the command: `plantuml -tsvg -v -o "out/diagrams" "**.puml"`
 
 ---
 
@@ -15,7 +15,7 @@ By enabling the efficient use of hardware resources, the application ensures tha
 
 Get a look at the main objectives of the application at this [Notion document](https://www.notion.so/Resource-Sharing-Services-044ffd0bc18c4abe9c809a4a4fb006df?pvs=4).
 
-![Architecture](.docs/out/diagrams/hrm-microservice.svg)
+![Architecture](.docs/out/diagrams/Workspaces.svg)
 ![Class Diagram](.docs/out/diagrams/api-gateway.svg)
 
 ## Old Architecture and class Diagram

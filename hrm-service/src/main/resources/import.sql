@@ -4,5 +4,10 @@
 -- insert into myentity (id, field) values(2, 'field-2');
 -- insert into myentity (id, field) values(3, 'field-3');
 -- alter sequence myentity_seq restart with 4;
-insert into event_offset(id, offset, eventType) values (1, now(), "summary_handler");
-
+create table if not exists workspace_state_events (
+    `offset` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `state` int,
+    `workspace` binary(16) not null,
+    PRIMARY KEY (`offset`),
+    FOREIGN KEY (`workspace`) REFERENCES `workspaces` (`uuid`)
+) ENGINE=innodb;
